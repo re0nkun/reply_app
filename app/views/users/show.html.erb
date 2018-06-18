@@ -1,0 +1,113 @@
+<p id="notice"><%#= notice %></p>
+
+<h2>
+  Name: <%= @user.name %>
+  <% if @user == current_user %>
+    <%= link_to 'Edit', edit_user_path(@user) %> |
+    <%= link_to 'Destroy', @user, method: :delete, data: { confirm: 'Are you sure?' } %>
+  <% end %>
+
+  <% if user_signed_in? && !(@user == current_user) %>
+    <% if current_user.following?(@user) %>
+      <%= link_to 'Unfollow', user_relations_path(@user), method: :delete %>
+    <% else %>          
+      <%= link_to 'Follow', user_relations_path(@user), method: :post %>
+    <% end %>
+  <% end %>
+</h2>
+
+<table>
+  <thead>
+    <tr>
+      <th>Posts</th>
+      <th colspan="3"></th>
+    </tr>
+  </thead>
+  
+  <tbody>
+    <% @user.posts.each do |post| %>
+      <tr>
+        <td><%= post.body %></td>
+        <td><%= post.created_at %></td>
+        <td>
+          <% if @user == current_user %>
+            <%= link_to '[X]', post, method: :delete, data: { confirm: 'Are you sure?' } %>
+          <% end %>
+        </td>
+      </tr>
+    <% end %>
+  </tbody>
+</table>
+
+<% if @user == current_user %>
+  <%= form_with(model: @user.posts.new, local: true) do |form| %>
+  <%#= form_for @user.posts.new do |form| %>
+    <div class="field">
+      <%#= form.label :body %>
+      <%= form.text_area :body, id: :post_body %>
+    </div>
+
+    <div class="actions">
+      <%= form.submit %>
+    </div>
+  <% end %>
+<% end %>
+
+<table>
+  <thead>
+    <tr>
+      <th><%= "Following(followeds)(#{@user.followeds.count})" %></th>
+      <th colspan="3"></th>
+    </tr>
+  </thead> 
+  <tbody>
+    <% @user.followeds.each do |u| %>
+      <tr>
+        <td><%= u.name %></td>
+      </tr>
+    <% end %>
+  </tbody>
+</table>
+<table>
+  <thead>
+    <tr>
+      <th><%= "Followers(#{@user.followers.count})" %></th>
+      <th colspan="3"></th>
+    </tr>
+  </thead> 
+  <tbody>
+    <% @user.followers.each do |u| %>
+      <tr>
+        <td><%= u.name %></td>
+      </tr>
+    <% end %>
+  </tbody>
+</table>
+
+<% if @user == current_user %>
+  <table>
+    <thead>
+      <tr>
+        <th>Feeds</th>
+        <th colspan="3"></th>
+      </tr>
+    </thead> 
+    <tbody>
+      <% @feeds.each do |f| %>
+        <tr>
+          <td><%= f.body %></td>
+          <td><%= "(by #{f.user.name} #{f.created_at})" %></td>
+          <td>
+            <% if current_user.following?(f.user) %>
+              <%= link_to 'Unfollow', user_relations_path(f.user), method: :delete %>
+            <% else %>          
+              <%= link_to 'Follow', user_relations_path(f.user), method: :post %>
+            <% end %>
+          </td>
+        </tr>
+      <% end %>
+    </tbody>
+  </table>
+<% end %>
+
+

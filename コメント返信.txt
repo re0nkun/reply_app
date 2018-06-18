@@ -1,0 +1,67 @@
+in_reply_toの数字のユーザーと
+そのpostを投稿したユーザーにだけ見える
+in_reply_to: 0はどのユーザーでも見れる
+postのbodyの中に@数字-ユーザー名があると返信できる
+before_validation :set_in_reply_toで@数字-ユーザー名を抜き出してin_reply_toに入れる
+validate :reply_to_userする
+    
+    rails g migration AddInReplyToToPosts in_reply_to:integer
+    class AddInReplyToToMicroposts < ActiveRecord::Migration
+      def change
+        add_column :posts, :in_reply_to, :integer, default: 0
+        add_index :posts, :in_reply_to
+      end
+    end
+
+//user.rb
+  following_ids = "SELECT followed_id FROM relations
+                    WHERE follower_id = :user_id"
+  Post.including_replies(id)
+            .where("user_id IN (#{following_ids})
+                    OR user_id = :user_id", user_id: id)
+    //post.rb
+      def Post.including_replies(id)
+          where(in_reply_to: [id, 0]).or(Post.where(user_id: id))
+      end
+
+before_validation :set_in_reply_to
+validates :in_reply_to, presence: false
+validate :reply_to_user
+
+//post.rb
+  def set_in_reply_to
+    if @index = body.index("@")
+      reply_id = []
+      while is_i?(body[@index+1])
+        @index += 1
+        reply_id << body[@index]
+      end
+      self.in_reply_to = reply_id.join.to_i
+    els
+      self.in_reply_to = 0
+    end
+  end
+      def is_i?(s)
+        Integer(s) != nil rescue false
+      end
+
+//post.rb
+  def reply_to_user
+    return if self.in_reply_to == 0 
+    
+    unless user = User.find_by(id: self.in_reply_to) 
+      errors.add(:base, "User ID you specified doesn't exist.")
+    else
+      if user_id == self.in_reply_to 
+        errors.add(:base, "You can't reply to yourself.")
+      else
+        unless reply_to_user_name_correct?(user) 
+          errors.add(:base, "User ID doesn't match its name.")
+        end
+      end
+    end
+  end
+      def reply_to_user_name_correct?(user)
+        user_name = user.name.gsub(" ", "-")
+        body[@index+2, user_name.length] == user_name
+      end

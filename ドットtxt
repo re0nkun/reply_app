@@ -1,0 +1,145 @@
+post
+ title string
+ body text
+comment
+ body string
+ post_id
+
+g model
+
+seed.rb
+
+g controller
+routes.rb
+posts#index
+  @posts
+
+posts/index
+  each
+
+routes.rb
+
+layouts/application
+css
+  .container
+    w400
+    m20auto
+  body
+    ffVss
+    fs14
+  h2
+    fs16
+    pb10
+    mb15
+    bb1s#d
+  ul>li
+    mb5
+
+posts/index
+  link
+post#show
+  @post
+
+posts/show
+
+assets/images
+layout/application
+  link image
+css
+  .logo
+    w400
+    h50
+
+posts/index
+  link Add New
+css
+  .header-menu
+    fs12
+    fwn
+    f r
+posts#new
+posts#create
+posts/new
+
+posts/new
+  form url
+  placeholder
+css
+  input[type="text"], textarea
+    bsbb
+    w400
+    p5
+  textarea
+    h160
+
+posts#create
+  @post post_params
+
+post.rb
+  pr min3 msg
+posts#create
+  if else
+  plain: @post.errors.inspect
+
+posts#create
+posts/new
+  if
+css
+  .error
+    fs12
+    fwb
+    c t
+posts#new
+
+posts/index
+  link edit
+css
+  .command
+    fs12
+posts#edit
+  @post
+posts/edit
+  form
+
+posts#update
+  @post if else
+posts/show
+  s_f
+
+posts/_form
+posts/new
+posts/edit
+
+posts/index
+  link X class data
+posts#destroy
+  @post
+
+g model
+comment.rb
+  pr
+post.rb
+routes.rb
+g controller
+
+posts/show
+  form
+css
+  h3
+    fs14
+    pt25
+
+comments#create
+  @post comment_params
+
+posts/show
+  if each
+
+posts/show
+  link x class data
+comments#destroy
+  @post @comment
+routes.rb
+  only
+
+dep

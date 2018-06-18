@@ -1,0 +1,70 @@
+  - ログインしていると自身のアカウントだけをedit/destroyできる   
+  - newいらない
+  - index edit/destroyリンクいらない
+  - sign_in  リダイレクトshow
+  - sign_up リダイレクトshow
+  - show　edit/destoryリンク追加　　
+  - edit showリンクいらない　backリンク変更
+
+rails generate scaffold User name:string 
+
+gem 'devise'
+bundle install
+
+rails generate devise:install
+
+  //config/environments/development.rb
+  + config.action_mailer.default_url_options = { host: 'localhost', port: 3000 }
+
+  //routes.rb
+  + root :to => 'xxx#index'
+
+  //app/views/layouts/application.html.erb
+  + <p class="notice"><%= notice %></p>
+  + <p class="alert"><%= alert %></p>
+
+rails g devise:views users
+
+rails generate devise User
+rails db:migrate
+
+rails g devise:controllers users
+
+//config/initializers/devise.rb
+config.scoped_views = true
+
+//application_controller.rb
+before_action :configure_permitted_parameters, if: :devise_controller?
+protected
+  def configure_permitted_parameters
+    added_attrs = [ :username, :email, :password, :password_confirmation　]
+    devise_parameter_sanitizer.permit :sign_up, keys: added_attrs
+    devise_parameter_sanitizer.permit :account_update, keys: added_attrs
+    devise_parameter_sanitizer.permit :sign_in, keys: added_attrs
+  end
+
+<% if user_signed_in? %>
+  Logged in as <%= current_user.name %>
+  <%= link_to "ログアウト", destroy_user_session_path, method: :delete %>
+<% else %>
+  <%= link_to "新規登録", new_user_registration_path %> |
+  <%= link_to "ログイン", new_user_session_path %>
+<% end %>
+
+//app/controllers/users_controller.rb
++ before_action :authenticate_user!
+
+//現在ログインしているユーザーのカラムに対する操作かどうか
+//show.html.erb
+@user == current_user
+//users_controller.rb
+before_action :set_current_user
+def set_current_user
+  @user = current_user
+end
+
+
+rails generate scaffold Post body:text user:references 
+rails db:migrate
+ 
+

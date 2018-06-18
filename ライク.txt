@@ -1,0 +1,2 @@
+ログインユーザー以外のshowのpostにライクボタン
+following_postにライクボタン

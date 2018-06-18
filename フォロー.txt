@@ -1,0 +1,95 @@
+    rails g model Relation follower_id:integer followed_id:integer
+    end
+    add_index :relations, :follower_id
+    add_index :relations, :followed_id
+    add_index :relations, [:follower_id, :followed_id], unique: true
+    rails db:migrate 
+
+    resources :users,  do
+      resource :relations, only: [:create, :destroy]
+    end
+
+    class Relation < ActiveRecord::Base
+      belongs_to :follower, class_name: User
+      belongs_to :followed, class_name: User
+    end
+    class User < ActiveRecord::Base
+      has_many :active_rels, class_name: "Relation", foreign_key: :follower_id
+      has_many :followeds, through: :active_rels
+        has_many :passive_rels, class_name: "Relation", foreign_key: :followed_id
+        has_many :followers, through: :passive_rels
+    end
+
+    //relation.rb
+      validates :follower_id, presence: true
+      validates :followed_id, presence: true
+    //user.rb
+      def following?(other_user)
+        self.followeds.include?(other_user)
+      end
+
+    //users/index.html.erb
+    if signed_in? && !(user == current_user)
+    if current_user.following?(user)
+
+
+    rails g controller Relations
+    before_action :authenticate_user!
+    def create
+      @user = User.find(params[:user_id])
+          # current_user.active_rels.create(followed_id: @user.id)
+      if @user.passive_rels.create(follower_id: current_user.id)
+        redirect_to tweets_url, notice: "フォローしました"
+      else
+        redirect_to tweets_url, alert: "フォローできません"
+      end
+    end
+    def destroy
+      @user = User.find(params[:user_id])
+                # current_user.active_rels.find_by(followed_id: @user.id)
+      follow = @user.passive_rels.find_by(follower_id: current_user.id)
+      follow.destroy
+      redirect_to tweets_url, notice: "フォローを解除しました"
+    end
+
+
+    def create
+      user = User.find(params[:followed_id])
+      current_user.active_relationships.create(followed_id: user.id)
+      redirect_to user
+    end
+    def destroy
+      user = Relationship.find(params[:id]).followed
+      current_user.active_rels.find_by(followed_id: user.id).destroy
+      redirect_to user
+    end
+    <%= form_for(current_user.active_relationships.build) do |f| %>
+      <div><%= hidden_field_tag :followed_id, user.id %></div>
+      <%= f.submit "Follow" %>
+    <% end %>
+    <%= form_for(current_user.active_rels.find_by(followed_id: user.id), html: { method: :delete }) do |f| %>
+      <%= f.submit "Unfollow" %>
+    <% end %>
+    //form_forから生成されるHTTPリクエスト
+
+
+    //他のユーザーをフォローできるようにする。
+    users/indexにフォロー/アンフォローボタンを置く
+    users/show
+    フォロー/フォロワー一覧
+    フォローした他のユーザーのポスト(ログインユーザーだけ)
+    最新順に表示する。
+    showにフォローボタン(ログインユーザー以外)
+    following_postにフォローボタン
+
+    default_scope -> { order(created_at: :desc) }
+
+    @following_posts = Post.eager_load(user: :passive_rels).where(relations: { follower_id: @user.id })
+
+    @following_posts = Post.where("user_id IN (?)", @user.followeds_ids)
+
+    @following_posts = Post.where("user_id IN (:following_ids)", following_ids: @user.followed_ids)
+
+    following_ids = "SELECT followed_id FROM relationships WHERE follower_id = :user_id"
+    @following_posts = Post.where("user_id IN (following_ids)")
+
